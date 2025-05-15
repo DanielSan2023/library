@@ -1,5 +1,6 @@
 package com.example.library.dto;
 
+import com.example.library.entity.Book;
 import lombok.*;
 
 @AllArgsConstructor
@@ -7,8 +8,10 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
+@Data
 @ToString
-public class BookCopyDto {
+public class BookCopyDtoFull {
     private Long id;
+    private Book book;
     private boolean available;
 }

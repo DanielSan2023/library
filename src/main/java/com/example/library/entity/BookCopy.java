@@ -1,15 +1,18 @@
 package com.example.library.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
+@Table(name = "BOOK_COPY")
 public class BookCopy {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "BOOK_ID", nullable = false)
     private Book book;
 
     @Column(nullable = false, columnDefinition = "tinyint(1) default 1")
