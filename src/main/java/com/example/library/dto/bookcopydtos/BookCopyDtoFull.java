@@ -1,17 +1,14 @@
-package com.example.library.dto;
+package com.example.library.dto.bookcopydtos;
 
-import com.example.library.entity.Book;
+import com.example.library.dto.bookdtos.BookDtoSimple;
 import lombok.*;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
-@Data
-@ToString
 public class BookCopyDtoFull {
     private Long id;
-    private Book book;
+    private BookDtoSimple book;
     private boolean available;
 }

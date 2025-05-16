@@ -1,19 +1,15 @@
-package com.example.library.dto;
+package com.example.library.dto.bookdtos;
 
 import lombok.*;
 
-import java.util.List;
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
-@ToString
-public class BookDtoFull {
+public class BookDtoSimple {
+    private Long id;
     private String title;
     private String author;
     private String isbn;
     private Integer publishedYear;
-    private List<BookCopyDto> copies;
 }
