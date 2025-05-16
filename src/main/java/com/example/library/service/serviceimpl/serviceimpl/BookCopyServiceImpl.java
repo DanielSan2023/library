@@ -1,7 +1,7 @@
 package com.example.library.service.serviceimpl.serviceimpl;
 
-import com.example.library.dto.BookCopyDtoSimple;
-import com.example.library.dto.BookCopyDtoFull;
+import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
+import com.example.library.dto.bookcopydtos.BookCopyDtoFull;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookCopyRepository;

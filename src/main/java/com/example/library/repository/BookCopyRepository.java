@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
-    //TODO add book copy to the repository
-    //TODO update book copy by id
+
+    void deleteByBookId(Long id);
 }
 

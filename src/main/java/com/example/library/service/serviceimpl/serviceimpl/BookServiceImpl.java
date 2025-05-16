@@ -1,6 +1,10 @@
 package com.example.library.service.serviceimpl.serviceimpl;
 
-import com.example.library.dto.*;
+import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
+import com.example.library.dto.bookdtos.BookDtoFull;
+import com.example.library.dto.bookdtos.BookDtoResponse;
+import com.example.library.dto.bookdtos.BookDtoSimple;
+import com.example.library.dto.bookdtos.BookDtoUpdate;
 import com.example.library.entity.Book;
 import com.example.library.repository.BookCopyRepository;
 import com.example.library.repository.BookRepository;
@@ -66,15 +70,11 @@ public class BookServiceImpl implements BookService {
             throw new EntityNotFoundException("Book not found with id: " + id);
         }
         bookCopyRepository.deleteByBookId(id);
-        bookRepository.deleteById(id);
-
-        if (!bookRepository.existsById(id)) {  //TODO create custom exception in |GlobalExceptionHandler|
-            throw new IllegalStateException("Failed to delete book with id: " + id);
-        }
+        bookRepository.deleteById(id);//TODO check if book has copies
     }
 
     @Override
-    public List<BookCopyDtoSimple> getCopiesByBookId(Long id) {
+    public List<BookCopyDtoSimple> getCopiesByBookId(Long id) {  //TODO is doesn't exist copies of Book create exception or  message to FE
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
 

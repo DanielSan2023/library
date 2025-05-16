@@ -1,7 +1,7 @@
 package com.example.library.service.serviceimpl;
 
-import com.example.library.dto.BookCopyDtoSimple;
-import com.example.library.dto.BookCopyDtoFull;
+import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
+import com.example.library.dto.bookcopydtos.BookCopyDtoFull;
 
 public interface BookCopyService {
 
