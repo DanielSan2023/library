@@ -5,13 +5,12 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Entity
+@Table(name = "BOOK")
 public class Book {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -29,7 +28,7 @@ public class Book {
     @Column(nullable = false)   //TODO should be a valid year
     private String publishedYear;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<BookCopy> copies = new ArrayList<>();
 
     @Override
