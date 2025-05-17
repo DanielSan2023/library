@@ -6,9 +6,10 @@ import com.example.library.dto.bookdtos.BookDtoResponse;
 import com.example.library.dto.bookdtos.BookDtoSimple;
 import com.example.library.dto.bookdtos.BookDtoUpdate;
 import com.example.library.entity.Book;
-import com.example.library.repository.BookCopyRepository;
 import com.example.library.repository.BookRepository;
 import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.validation.BookFetcherValidator;
+import com.example.library.service.validation.BookValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,8 +24,9 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-    private final BookCopyRepository bookCopyRepository;
     private final ModelMapper modelMapper;
+    private final BookValidator bookValidator;
+    private final BookFetcherValidator bookFetcherValidator;
 
     @Override
     public List<BookDtoSimple> getAllBooks() {
@@ -35,51 +37,66 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDtoResponse createBook(BookDtoResponse book) {
-        if (bookRepository.existsByIsbn(book.getIsbn())) {           //TODO check if doesn't exist book with ISBN
-            throw new IllegalArgumentException("Book with ISBN " + book.getIsbn() + " already exists");
-        }
-        Book newBook = modelMapper.map(book, Book.class);
+    @Transactional
+    public BookDtoResponse createBook(BookDtoResponse bookDto) {
+        bookValidator.validateIsbn(bookDto.getIsbn());
+        bookValidator.validatePublishedYear(bookDto.getPublishedYear());
+
+        checkForDuplicate(bookDto);
+
+        Book newBook = modelMapper.map(bookDto, Book.class);
         Book savedBook = bookRepository.save(newBook);
 
         return modelMapper.map(savedBook, BookDtoResponse.class);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookDtoFull getBookById(Long id) {
-        Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+        Book book = bookFetcherValidator.getBookIfExistInDB(id);
+
         return modelMapper.map(book, BookDtoFull.class);
     }
 
     @Override
+    @Transactional
     public BookDtoFull updateBook(Long id, BookDtoUpdate bookDto) {
-        Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+        bookValidator.validatePublishedYear(bookDto.getPublishedYear());
+        bookValidator.validateIsbn(bookDto.getIsbn());
 
+        Book book = bookFetcherValidator.getBookIfExistInDB(id);
+        bookValidator.validateIsbnConsistency(book.getIsbn(), bookDto.getIsbn());
         modelMapper.map(bookDto, book);
 
         Book updatedBook = bookRepository.save(book);
         return modelMapper.map(updatedBook, BookDtoFull.class);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
             throw new EntityNotFoundException("Book not found with id: " + id);
         }
-        bookCopyRepository.deleteByBookId(id);
-        bookRepository.deleteById(id);//TODO check if book has copies
+        bookRepository.deleteById(id);
     }
 
     @Override
-    public List<BookCopyDtoSimple> getCopiesByBookId(Long id) {  //TODO is doesn't exist copies of Book create exception or  message to FE
-        Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+    @Transactional(readOnly = true)
+    public List<BookCopyDtoSimple> getCopiesByBookId(Long id) {
+        Book book = bookFetcherValidator.getBookIfExistInDB(id);
 
         return book.getCopies().stream()
                 .map(bookCopy -> modelMapper.map(bookCopy, BookCopyDtoSimple.class))
                 .collect(Collectors.toList());
+    }
+
+    private void checkForDuplicate(BookDtoResponse bookDto) {
+        if (bookRepository.existsByTitle(bookDto.getTitle())) {
+            throw new IllegalArgumentException("Book with title is already exist in DB!");
+        }
+        if (bookRepository.existsByIsbn(bookDto.getIsbn())) {
+            throw new IllegalArgumentException("Book with ISBN is already exist in DB!");
+        }
     }
 }

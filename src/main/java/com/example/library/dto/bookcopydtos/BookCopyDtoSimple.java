@@ -1,5 +1,7 @@
 package com.example.library.dto.bookcopydtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -7,6 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class BookCopyDtoSimple {
+
+    @NotBlank(message = "Book copy Id is required")
     private Long id;
-    private boolean available;
+
+    @NotNull(message = "Availability is required")
+    private Boolean available;
 }

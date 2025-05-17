@@ -22,11 +22,11 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-    @Column(nullable = false, unique = true) //TODO follow the ISBN standard
+    @Column(nullable = false, unique = true)
     private String isbn;
 
-    @Column(nullable = false)   //TODO should be a valid year
-    private String publishedYear;
+    @Column(nullable = false)
+    private Integer publishedYear;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<BookCopy> copies = new ArrayList<>();
@@ -36,11 +36,16 @@ public class Book {
         if (this == o) return true;
         if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return isbn != null && isbn.equals(book.isbn);
+        return title != null && isbn != null &&
+                title.equals(book.title) &&
+                isbn.equals(book.isbn);
     }
 
     @Override
     public int hashCode() {
-        return isbn != null ? isbn.hashCode() : 0;
+        int result = 17;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (isbn != null ? isbn.hashCode() : 0);
+        return result;
     }
 }

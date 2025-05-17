@@ -24,7 +24,7 @@ public class BookCopy {
     @Builder.Default
     @Column(nullable = false, columnDefinition = "tinyint(1) default 1")
     //TODO exactly  sql command for Flyway migration
-    private boolean available = true;
+    private Boolean available = true;
 }
 
 

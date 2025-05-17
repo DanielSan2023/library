@@ -1,6 +1,8 @@
 package com.example.library.dto.bookcopydtos;
 
 import com.example.library.dto.bookdtos.BookDtoSimple;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -9,6 +11,10 @@ import lombok.*;
 @Builder
 public class BookCopyDtoFull {
     private Long id;
+
+    @NotBlank(message = "Book is required")
     private BookDtoSimple book;
-    private boolean available;
+
+    @NotNull(message = "Availability is required")
+    private Boolean available;
 }
