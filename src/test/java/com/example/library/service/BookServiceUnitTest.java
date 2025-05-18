@@ -1,10 +1,7 @@
 package com.example.library.service;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoFull;
-import com.example.library.dto.bookdtos.BookDtoResponse;
-import com.example.library.dto.bookdtos.BookDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoUpdate;
+import com.example.library.dto.bookdtos.*;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookRepository;
@@ -103,7 +100,7 @@ public class BookServiceUnitTest {
         when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
 
         // When
-        BookDtoResponse result = bookService.createBook(bookDto);
+        BookDtoResponseFull result = bookService.createBook(bookDto);
 
         // Then
         assertThat(result)

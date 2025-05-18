@@ -1,10 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoFull;
-import com.example.library.dto.bookdtos.BookDtoResponse;
-import com.example.library.dto.bookdtos.BookDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoUpdate;
+import com.example.library.dto.bookdtos.*;
 import com.example.library.exception.BookNotFoundException;
 import com.example.library.service.serviceimpl.BookService;
 import org.junit.jupiter.api.Test;
@@ -63,14 +60,15 @@ public class BookControllerUnitTest {
     void GIVEN_valid_book_WHEN_createBook_THEN_return_Ok_Status_created_book() {
         //GIVEN
         BookDtoResponse book = new BookDtoResponse();
-        when(bookService.createBook(book)).thenReturn(book);
+        BookDtoResponseFull bookResponse = new BookDtoResponseFull();
+        when(bookService.createBook(book)).thenReturn(bookResponse);
 
         //WHEN
-        ResponseEntity<BookDtoResponse> response = bookController.createBook(book);
+        ResponseEntity<BookDtoResponseFull> response = bookController.createBook(book);
 
         //THEN
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isEqualTo(book);
+        assertThat(response.getBody()).isEqualTo(bookResponse);
     }
 
     @Test
