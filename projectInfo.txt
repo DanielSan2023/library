@@ -45,7 +45,7 @@ Design and implement a simple Library Management System using Spring Boot. This 
 	* Example response:
 ```json
 [
-  {
+  {                                                 //<List<BookDtoSimple>>
     "id": 1,
     "title": "Effective Java",
     "author": "Joshua Bloch",
@@ -59,20 +59,20 @@ Design and implement a simple Library Management System using Spring Boot. This 
 	* Endpoint: `POST /api/books`
 	* Request body:
 ```json
-{
+{                                                        //BookDtoResponse
   "title": "Clean Code",
   "author": "Robert C. Martin",
   "isbn": "978-0132350884",
   "publishedYear": 2008
 }
 ```
-	* Response: The created book object with its ID.
+	* Response: The created book object with its ID.    //BookDtoResponseFull
 3. **Get a book by ID**
 	* Endpoint: `GET /api/books/{id}`
 	* Response: The book object with the given ID, including its copies.
 	* Example response:
 ```json
-{
+{                                                       //BookDtoFull
   "id": 1,
   "title": "Effective Java",
   "author": "Joshua Bloch",
@@ -94,21 +94,21 @@ Design and implement a simple Library Management System using Spring Boot. This 
 	* Endpoint: `PUT /api/books/{id}`
 	* Request body (only the fields to be updated should be included):
 ```json
-{
+{                                                       //*******BookDtoUpdate added "isbn" field for checking
   "title": "Effective Java (3rd Edition)",
   "publishedYear": 2018
 }
 ```
-	* Response: The updated book object.
+	* Response: The updated book object.                //BookDtoFull
 5. **Delete a book by ID**
 	* Endpoint: `DELETE /api/books/{id}`
-	* Response: No content (status code 204).
+	* Response: No content (status code 204).           //Void
 6. **Get available copies for a book**
 	* Endpoint: `GET /api/books/{id}/copies`
 	* Response: List of book copies with their IDs and availability status for the given book ID.
 	* Example response:
 ```json
-[
+[                                                       //<List<BookCopyDtoSimple>>
   {
     "id": 1,
     "available": true
@@ -121,20 +121,25 @@ Design and implement a simple Library Management System using Spring Boot. This 
 ```
 7. **Add a copy for a book**
 	* Endpoint: `POST /api/books/{id}/copies`
-	* Response: The created book copy object with its ID.
+	* Response: The created book copy object with its ID.       //BookCopyDtoSimple
 8. **Update the availability status of a book copy**
 	* Endpoint: `PUT /api/books/{id}/copies/{copyId}`
 	* Request body:
 ```json
-{
+{                                                           //BookCopyDtoUpdate
   "available": false
 }
 ```
-	* Response: The updated book copy object.
+	* Response: The updated book copy object.            //BookCopyDtoFull
+9.Pagination and sorting
+    * Endpoint: `GET /api/books/pageable`
+    * Query parameters:
+        * `page` (int, default: 0)
+        * `size` (int, default: 10)
+        * `sort` (String, default: "id,asc")
+    * Response: Paginated list of books with sorting options.  //<Page<BookDtoSimple>>
 
-**Bonus:**
 
-1. Implement pagination and sorting for the `GET /api/books` endpoint.
 1. Add a simple frontend using Thymeleaf or any other template engine to display books and their copies.
 
 **Evaluation Criteria:**
