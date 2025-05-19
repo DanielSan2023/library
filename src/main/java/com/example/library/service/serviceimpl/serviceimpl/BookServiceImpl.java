@@ -1,10 +1,7 @@
 package com.example.library.service.serviceimpl.serviceimpl;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoFull;
-import com.example.library.dto.bookdtos.BookDtoResponse;
-import com.example.library.dto.bookdtos.BookDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoUpdate;
+import com.example.library.dto.bookdtos.*;
 import com.example.library.entity.Book;
 import com.example.library.repository.BookRepository;
 import com.example.library.service.serviceimpl.BookService;
@@ -38,7 +35,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookDtoResponse createBook(BookDtoResponse bookDto) {
+    public BookDtoResponseFull createBook(BookDtoResponse bookDto) {
         bookValidator.validateIsbn(bookDto.getIsbn());
         bookValidator.validatePublishedYear(bookDto.getPublishedYear());
 
@@ -47,7 +44,7 @@ public class BookServiceImpl implements BookService {
         Book newBook = modelMapper.map(bookDto, Book.class);
         Book savedBook = bookRepository.save(newBook);
 
-        return modelMapper.map(savedBook, BookDtoResponse.class);
+        return modelMapper.map(savedBook, BookDtoResponseFull.class);
     }
 
     @Override

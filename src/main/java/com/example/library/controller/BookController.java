@@ -1,10 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoFull;
-import com.example.library.dto.bookdtos.BookDtoResponse;
-import com.example.library.dto.bookdtos.BookDtoSimple;
-import com.example.library.dto.bookdtos.BookDtoUpdate;
+import com.example.library.dto.bookdtos.*;
 import com.example.library.service.serviceimpl.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -29,8 +26,8 @@ public class BookController {
     }
 
     @PostMapping()
-    public ResponseEntity<BookDtoResponse> createBook(@Valid @RequestBody BookDtoResponse book) {
-        BookDtoResponse createdBook = bookService.createBook(book);
+    public ResponseEntity<BookDtoResponseFull> createBook(@Valid @RequestBody BookDtoResponse book) {
+        BookDtoResponseFull createdBook = bookService.createBook(book);
         return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
     }
 
