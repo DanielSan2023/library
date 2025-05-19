@@ -10,6 +10,8 @@ import com.example.library.service.validation.BookValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,6 +88,12 @@ public class BookServiceImpl implements BookService {
         return book.getCopies().stream()
                 .map(bookCopy -> modelMapper.map(bookCopy, BookCopyDtoSimple.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<BookDtoSimple> getPageBooks(Pageable pageable) {
+        Page<Book> booksPage = bookRepository.findAll(pageable);
+        return booksPage.map(book -> modelMapper.map(book, BookDtoSimple.class));
     }
 
     private void checkForDuplicate(BookDtoResponse bookDto) {

@@ -4,6 +4,10 @@ import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
 import com.example.library.service.serviceimpl.BookService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,5 +57,11 @@ public class BookController {
     public ResponseEntity<List<BookCopyDtoSimple>> getAllBookCopies(@PathVariable Long id) {
         List<BookCopyDtoSimple> bookCopies = bookService.getCopiesByBookId(id);
         return new ResponseEntity<>(bookCopies, HttpStatus.OK);
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<BookDtoSimple>> getBooksPageable(@PageableDefault(size = 3, page = 0, sort = "title", direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<BookDtoSimple> books = bookService.getPageBooks(pageable);
+        return ResponseEntity.ok(books);
     }
 }

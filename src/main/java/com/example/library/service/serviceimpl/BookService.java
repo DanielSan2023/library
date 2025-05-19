@@ -2,6 +2,8 @@ package com.example.library.service.serviceimpl;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,4 +20,6 @@ public interface BookService {
     void deleteBook(Long id);
 
     List<BookCopyDtoSimple> getCopiesByBookId(Long id);
+
+    Page<BookDtoSimple> getPageBooks(Pageable pageable);
 }
