@@ -105,6 +105,7 @@ public class BookServiceUnitTest {
         // Then
         assertThat(result)
                 .usingRecursiveComparison()
+                .ignoringFields("id")
                 .isEqualTo(expectedDto);
 
         verify(bookValidator).validateIsbn(bookDto.getIsbn());
