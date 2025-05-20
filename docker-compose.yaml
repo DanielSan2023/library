@@ -15,5 +15,18 @@ services:
       - mysql-data:/var/lib/mysql
     restart: always
 
+  swagger-ui:
+      image: swaggerapi/swagger-ui
+      container_name: swagger-ui
+      ports:
+        - "8081:8080"
+      volumes:
+            - ./docs/openapi-library-doc.yaml:/docs/openapi.yaml:ro
+      environment:
+        SWAGGER_JSON: /docs/openapi.yaml
+#      volumes:
+#        - ./docs/openapi-library-doc.yaml:/docs/openapi.yaml:ro
+      restart: always
+
 volumes:
   mysql-data:

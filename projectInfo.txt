@@ -66,7 +66,7 @@ Design and implement a simple Library Management System using Spring Boot. This 
   "publishedYear": 2008
 }
 ```
-	* Response: The created book object with its ID.    //BookDtoResponseFull
+	* Response: The created book object with its ID.    //BookDtoFull
 3. **Get a book by ID**
 	* Endpoint: `GET /api/books/{id}`
 	* Response: The book object with the given ID, including its copies.
