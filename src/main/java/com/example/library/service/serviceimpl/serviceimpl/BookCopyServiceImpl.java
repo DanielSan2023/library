@@ -43,7 +43,7 @@ public class BookCopyServiceImpl implements BookCopyService {
 
     @Override
     @Transactional
-    public BookCopyDtoFull updateAvailability(Long bookId, Long copyId, boolean available) {
+    public BookCopyDtoFull updateAvailability(Long bookId, Long copyId, Boolean available) {
         BookCopy bookCopy = bookCopyFetcherValidator.getBookCopyIfExistInDB(copyId);
 
         bookCopyFetcherValidator.controlOwnershipBookCopyAndBook(bookId, bookCopy);

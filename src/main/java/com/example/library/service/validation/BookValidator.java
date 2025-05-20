@@ -35,7 +35,7 @@ public class BookValidator {
     public void validateIsbnConsistency(String existingIsbn, String requestIsbn) {
         if (!existingIsbn.equals(requestIsbn)) {
             throw new ValidationException(String.format(
-                    "Book ISBN mismatch: existing = '%s', requested = '%s'",
+                    ISBN_MISMATCH_EXCEPTION,
                     existingIsbn, requestIsbn
             ));
         }

@@ -7,5 +7,5 @@ public interface BookCopyService {
 
      BookCopyDtoSimple addCopyToBook(Long bookId);
 
-     BookCopyDtoFull updateAvailability(Long bookId, Long copyId, boolean available);
+     BookCopyDtoFull updateAvailability(Long bookId, Long copyId, Boolean available);
 }

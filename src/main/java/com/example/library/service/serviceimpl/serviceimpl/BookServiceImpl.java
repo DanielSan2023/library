@@ -8,6 +8,7 @@ import com.example.library.repository.BookRepository;
 import com.example.library.service.serviceimpl.BookCopyService;
 import com.example.library.service.serviceimpl.BookService;
 import com.example.library.service.validation.BookCopyFetcherValidator;
+import com.example.library.service.validation.BookCopyValidator;
 import com.example.library.service.validation.BookFetcherValidator;
 import com.example.library.service.validation.BookValidator;
 import com.example.library.utility.BookConstants;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.library.utility.BookConstants.*;
+
 @Service
 @AllArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -29,6 +32,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
     private final BookValidator bookValidator;
+    private final BookCopyValidator bookCopyValidator;
     private final BookFetcherValidator bookFetcherValidator;
     private final BookCopyFetcherValidator bookCopyFetcherValidator;
     private final BookCopyService bookCopyService;
@@ -81,7 +85,7 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("Book not found with id: " + id);
+            throw new EntityNotFoundException(BOOK_COPY_NOT_FOUND + id);
         }
         bookRepository.deleteById(id);
     }
@@ -101,12 +105,12 @@ public class BookServiceImpl implements BookService {
         return booksPage.map(book -> modelMapper.map(book, BookDtoSimple.class));
     }
 
-    private void checkForDuplicate(BookDtoResponse bookDto) {
+    private void checkForDuplicate(BookDtoResponse bookDto) {  //TODO refactor to BookValidator class
         if (bookRepository.existsByTitle(bookDto.getTitle())) {
-            throw new IllegalArgumentException("Book with title is already exist in DB!");
+            throw new IllegalArgumentException(DUPLICATE_TITLE_EXCEPTION);
         }
         if (bookRepository.existsByIsbn(bookDto.getIsbn())) {
-            throw new IllegalArgumentException("Book with ISBN is already exist in DB!");
+            throw new IllegalArgumentException(DUPLICATE_ISBN_EXCEPTION);
         }
     }
 
@@ -122,6 +126,8 @@ public class BookServiceImpl implements BookService {
                 .filter(copy -> Boolean.valueOf(!available).equals(copy.getAvailable()))
                 .toList();
 
+        bookCopyValidator.validateBookCopyAvailability(filteredCopies);
+
         if (available) {
             bookCopyFetcherValidator.validateIfBookCopyIsUnavailable(filteredCopies);
         } else {
@@ -129,7 +135,6 @@ public class BookServiceImpl implements BookService {
         }
 
         BookCopy targetBookCopy = filteredCopies.get(0);
-
         bookCopyService.updateAvailability(bookId, targetBookCopy.getId(), available ? BookConstants.AVAILABLE : BookConstants.UNAVAILABLE);
     }
 }
