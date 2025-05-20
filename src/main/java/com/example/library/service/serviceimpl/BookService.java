@@ -11,7 +11,7 @@ public interface BookService {
 
     List<BookDtoSimple> getAllBooks();
 
-    BookDtoResponseFull createBook(BookDtoResponse book);
+    BookDtoSimple createBook(BookDtoResponse book);
 
     BookDtoFull getBookById(Long id);
 

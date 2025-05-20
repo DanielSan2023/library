@@ -37,7 +37,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookDtoResponseFull createBook(BookDtoResponse bookDto) {
+    public BookDtoSimple createBook(BookDtoResponse bookDto) {
         bookValidator.validateIsbn(bookDto.getIsbn());
         bookValidator.validatePublishedYear(bookDto.getPublishedYear());
 
@@ -46,7 +46,7 @@ public class BookServiceImpl implements BookService {
         Book newBook = modelMapper.map(bookDto, Book.class);
         Book savedBook = bookRepository.save(newBook);
 
-        return modelMapper.map(savedBook, BookDtoResponseFull.class);
+        return modelMapper.map(savedBook, BookDtoSimple.class);
     }
 
     @Override
