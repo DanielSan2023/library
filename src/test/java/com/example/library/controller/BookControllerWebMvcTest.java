@@ -65,7 +65,7 @@ public class BookControllerWebMvcTest {
                 .publishedYear(2008)
                 .build();
 
-        BookDtoResponseFull returnedDto = BookDtoResponseFull.builder()
+        BookDtoSimple returnedDto = BookDtoSimple.builder()
                 .id(10L)
                 .title("Clean Code")
                 .author("Robert C. Martin")

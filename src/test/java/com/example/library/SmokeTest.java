@@ -88,31 +88,31 @@ public class SmokeTest {
     @Test
     void GIVEN_Books_in_db_WHEN_GetBooksPageable_THENrReturn_correct_pagination() throws Exception {
 
-        // Page 0, size 2, sorted by title desc
+        // Page 0, size 2, sorted by title
         mockMvc.perform(get("/api/books/pageable")
                         .param("page", "0")
                         .param("size", "2")
-                        .param("sort", "title,desc")
+                        .param("sort", "title")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].title").value("To Kill a Mockingbird"))
-                .andExpect(jsonPath("$.content[1].title").value("The Great Gatsby"))
+                .andExpect(jsonPath("$.content[0].title").value("1984"))
+                .andExpect(jsonPath("$.content[1].title").value("Clean Code"))
                 .andExpect(jsonPath("$.totalElements").value(4))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.number").value(0))
                 .andExpect(jsonPath("$.size").value(2));
 
-        // Page 1, size 2, sorted by title desc
+        // Page 1, size 2, sorted by title
         mockMvc.perform(get("/api/books/pageable")
                         .param("page", "1")
                         .param("size", "2")
-                        .param("sort", "title,desc")
+                        .param("sort", "title")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].title").value("Clean Code"))
-                .andExpect(jsonPath("$.content[1].title").value("1984"))
+                .andExpect(jsonPath("$.content[0].title").value("The Great Gatsby"))
+                .andExpect(jsonPath("$.content[1].title").value("To Kill a Mockingbird"))
                 .andExpect(jsonPath("$.totalElements").value(4))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.number").value(1))

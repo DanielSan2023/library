@@ -4,7 +4,7 @@ import com.example.library.LibraryApplication;
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookcopydtos.BookCopyDtoUpdate;
 import com.example.library.dto.bookdtos.BookDtoResponse;
-import com.example.library.dto.bookdtos.BookDtoResponseFull;
+import com.example.library.dto.bookdtos.BookDtoSimple;
 import com.example.library.entity.Book;
 import com.example.library.integration.config.TestcontainersConfiguration;
 import com.example.library.repository.BookRepository;
@@ -111,7 +111,7 @@ public class BookControllerIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        BookDtoResponseFull createdBook = objectMapper.readValue(bookResponse, BookDtoResponseFull.class);
+        BookDtoSimple createdBook = objectMapper.readValue(bookResponse, BookDtoSimple.class);
         bookId = createdBook.getId();
         assertThat(bookId).isNotNull();
         assertThat(createdBook.getIsbn()).isEqualTo("9780134685991");

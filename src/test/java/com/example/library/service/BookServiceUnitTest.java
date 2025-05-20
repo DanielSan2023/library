@@ -100,7 +100,7 @@ public class BookServiceUnitTest {
         when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
 
         // When
-        BookDtoResponseFull result = bookService.createBook(bookDto);
+        BookDtoSimple result = bookService.createBook(bookDto);
 
         // Then
         assertThat(result)

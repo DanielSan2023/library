@@ -60,11 +60,11 @@ public class BookControllerUnitTest {
     void GIVEN_valid_book_WHEN_createBook_THEN_return_Ok_Status_created_book() {
         //GIVEN
         BookDtoResponse book = new BookDtoResponse();
-        BookDtoResponseFull bookResponse = new BookDtoResponseFull();
+        BookDtoSimple bookResponse = new BookDtoSimple();
         when(bookService.createBook(book)).thenReturn(bookResponse);
 
         //WHEN
-        ResponseEntity<BookDtoResponseFull> response = bookController.createBook(book);
+        ResponseEntity<BookDtoSimple> response = bookController.createBook(book);
 
         //THEN
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
