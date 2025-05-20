@@ -6,6 +6,7 @@ import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookCopyRepository;
 import com.example.library.service.serviceimpl.serviceimpl.BookCopyServiceImpl;
+import com.example.library.service.validation.BookCopyFetcherValidator;
 import com.example.library.service.validation.BookFetcherValidator;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,9 @@ public class BookCopyServiceUnitTest {
     @Mock
     private BookFetcherValidator bookFetcherValidator;
 
+    @Mock
+    private BookCopyFetcherValidator bookCopyFetcherValidator;
+
     private ModelMapper modelMapper;
     private BookCopyServiceImpl bookCopyService;
 
@@ -36,7 +40,7 @@ public class BookCopyServiceUnitTest {
     void setUp() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
-        bookCopyService = new BookCopyServiceImpl(bookCopyRepository, modelMapper, bookFetcherValidator);
+        bookCopyService = new BookCopyServiceImpl(bookCopyRepository, modelMapper, bookFetcherValidator, bookCopyFetcherValidator);
     }
 
     @Test
@@ -75,7 +79,8 @@ public class BookCopyServiceUnitTest {
         BookCopy bookCopy = BookCopy.builder().id(copyId).book(book).available(true).build();
         BookCopy updatedCopy = BookCopy.builder().id(copyId).book(book).available(false).build();
 
-        when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(bookCopy));
+        when(bookCopyFetcherValidator.getBookCopyIfExistInDB(copyId)).thenReturn(bookCopy);
+        doNothing().when(bookCopyFetcherValidator).controlOwnershipBookCopyAndBook(bookId, bookCopy);
         when(bookCopyRepository.save(bookCopy)).thenReturn(updatedCopy);
 
         // When
@@ -84,9 +89,11 @@ public class BookCopyServiceUnitTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getClass()).isEqualTo(BookCopyDtoFull.class);
-        verify(bookCopyRepository).findById(copyId);
+        verify(bookCopyFetcherValidator).getBookCopyIfExistInDB(copyId);
+        verify(bookCopyFetcherValidator).controlOwnershipBookCopyAndBook(bookId, bookCopy);
         verify(bookCopyRepository).save(bookCopy);
     }
+
 
     @Test
     void GIVEN_no_exists_copy_WHEN_updateAvailability_THEN_throw_EntityNotFound() {
@@ -94,9 +101,10 @@ public class BookCopyServiceUnitTest {
         Long bookId = 1L;
         Long copyId = 99L;
 
-        when(bookCopyRepository.findById(copyId)).thenReturn(Optional.empty());
+        when(bookCopyFetcherValidator.getBookCopyIfExistInDB(copyId))
+                .thenThrow(new EntityNotFoundException("Book copy not found with id: " + copyId));
 
-        //WHEN // Then
+        // When / Then
         assertThatThrownBy(() -> bookCopyService.updateAvailability(bookId, copyId, true))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Book copy not found with id: " + copyId);
@@ -108,13 +116,16 @@ public class BookCopyServiceUnitTest {
         Long bookId = 1L;
         Long copyId = 10L;
 
-        Book correctBook = new Book();
-        correctBook.setId(2L);
+        Book incorrectBook = new Book();
+        incorrectBook.setId(2L);
 
-        BookCopy copy = BookCopy.builder().id(copyId).book(correctBook).available(true).build();
-        when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(copy));
+        BookCopy copy = BookCopy.builder().id(copyId).book(incorrectBook).available(true).build();
 
-        //WHEN // Then
+        when(bookCopyFetcherValidator.getBookCopyIfExistInDB(copyId)).thenReturn(copy);
+        doThrow(new IllegalArgumentException("Book copy does not belong to the specified book"))
+                .when(bookCopyFetcherValidator).controlOwnershipBookCopyAndBook(bookId, copy);
+
+        // When / Then
         assertThatThrownBy(() -> bookCopyService.updateAvailability(bookId, copyId, true))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Book copy does not belong to the specified book");

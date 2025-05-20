@@ -4,6 +4,7 @@ import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
 import com.example.library.exception.BookNotFoundException;
 import com.example.library.service.serviceimpl.BookService;
+import com.example.library.utility.BookConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.example.library.utility.BookConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -90,14 +92,13 @@ public class BookControllerUnitTest {
     void GIVEN_no_exists_bookId_WHEN_getBookById_THEN_throwBookNotFoundException() {
         // GIVEN
         long bookId = 10L;
-        when(bookService.getBookById(bookId)).thenThrow(new BookNotFoundException("Book not found"));
+        when(bookService.getBookById(bookId)).thenThrow(new BookNotFoundException(BOOK_NOT_FOUND_TEST));
 
         // WHEN / THEN
         BookNotFoundException ex = assertThrows(BookNotFoundException.class, () -> {
             bookController.getBookById(bookId);
         });
-
-        assertThat(ex.getMessage()).isEqualTo("Book not found");
+        assertThat(ex.getMessage()).isEqualTo(BOOK_NOT_FOUND_TEST);
     }
 
     @Test
@@ -134,14 +135,14 @@ public class BookControllerUnitTest {
     void GIVEN_no_exists_BookId_WHEN_deleteBook_THEN_throw_BookNotFoundException() {
         // GIVEN
         long bookId = 1L;
-        doThrow(new BookNotFoundException("Book not found")).when(bookService).deleteBook(bookId);
+        doThrow(new BookNotFoundException(BOOK_NOT_FOUND_TEST)).when(bookService).deleteBook(bookId);
 
         // WHEN / THEN
         BookNotFoundException ex = assertThrows(BookNotFoundException.class, () -> {
             bookController.deleteBook(bookId);
         });
 
-        assertThat(ex.getMessage()).isEqualTo("Book not found");
+        assertThat(ex.getMessage()).isEqualTo(BOOK_NOT_FOUND_TEST);
     }
 
     @Test
@@ -178,14 +179,72 @@ public class BookControllerUnitTest {
     void GIVEN_no_exists_bookId_WHEN_getAllBookCopies_THEN_throwBookNotFoundException() {
         // GIVEN
         long bookId = 99L;
-        when(bookService.getCopiesByBookId(bookId)).thenThrow(new BookNotFoundException("Book not found"));
+        when(bookService.getCopiesByBookId(bookId)).thenThrow(new BookNotFoundException(BOOK_NOT_FOUND_TEST));
 
         // WHEN / THEN
         BookNotFoundException ex = assertThrows(BookNotFoundException.class, () -> {
             bookController.getAllBookCopies(bookId);
         });
 
-        assertThat(ex.getMessage()).isEqualTo("Book not found");
+        assertThat(ex.getMessage()).isEqualTo(BOOK_NOT_FOUND_TEST);
+    }
+
+    @Test
+    void GIVEN_valid_bookId_WHEN_borrowBookCopy_THEN_return_NO_CONTENT_Status() {
+        // GIVEN
+        long bookId = 1L;
+
+        // WHEN
+        ResponseEntity<Void> response = bookController.borrowBookCopy(bookId);
+
+        // THEN
+        verify(bookService).updateBookCopyAvailability(bookId, BookConstants.BORROW_BOOK_COPY);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void GIVEN_valid_bookId_WHEN_returnBookCopy_THEN_return_NO_CONTENT_Status() {
+        // GIVEN
+        long bookId = 1L;
+
+        // WHEN
+        ResponseEntity<Void> response = bookController.returnBookCopy(bookId);
+
+        // THEN
+        verify(bookService).updateBookCopyAvailability(bookId, BookConstants.RETURN_BOOK_COPY);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void GIVEN_non_existing_bookId_WHEN_borrowBookCopy_THEN_throw_BookNotFoundException() {
+        // GIVEN
+        long bookId = 999L;
+        doThrow(new BookNotFoundException(BOOK_NOT_FOUND_TEST)).when(bookService)
+                .updateBookCopyAvailability(bookId, BookConstants.BORROW_BOOK_COPY);
+
+        // WHEN / THEN
+        BookNotFoundException ex = assertThrows(BookNotFoundException.class, () -> {
+            bookController.borrowBookCopy(bookId);
+        });
+
+        assertThat(ex.getMessage()).isEqualTo(BOOK_NOT_FOUND_TEST);
+    }
+
+    @Test
+    void GIVEN_non_existing_bookId_WHEN_returnBookCopy_THEN_throw_BookNotFoundException() {
+        // GIVEN
+        long bookId = 999L;
+        doThrow(new BookNotFoundException(BOOK_NOT_FOUND_TEST)).when(bookService)
+                .updateBookCopyAvailability(bookId, BookConstants.RETURN_BOOK_COPY);
+
+        // WHEN / THEN
+        BookNotFoundException ex = assertThrows(BookNotFoundException.class, () -> {
+            bookController.returnBookCopy(bookId);
+        });
+
+        assertThat(ex.getMessage()).isEqualTo(BOOK_NOT_FOUND_TEST);
     }
 }
 

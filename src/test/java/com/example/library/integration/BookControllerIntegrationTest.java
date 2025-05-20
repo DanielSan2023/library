@@ -215,4 +215,55 @@ public class BookControllerIntegrationTest {
         mockMvc.perform(get("/api/books/" + bookId + "/copies"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("should borrow and then return a book copy successfully")
+    void borrow_and_return_BookCopy() throws Exception {
+        // ADD BOOK
+        BookDtoResponse newBook = BookDtoResponse.builder()
+                .title("Domain-Driven Design")
+                .author("Eric Evans")
+                .isbn("9780321125217")
+                .publishedYear(2004)
+                .build();
+
+        String bookResponse = mockMvc.perform(post("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newBook)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        Long createdBookId = objectMapper.readTree(bookResponse).get("id").asLong();
+
+        // ADD BOOK ONE COPY
+        String copyResponse = mockMvc.perform(post("/api/books/{id}/copies", createdBookId))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        Long createdCopyId = objectMapper.readTree(copyResponse).get("id").asLong();
+
+        // VALIDATE BOOK COPY IF EXISTS
+        mockMvc.perform(get("/api/books/{id}/copies", createdBookId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(createdCopyId))
+                .andExpect(jsonPath("$[0].available").value(true));
+
+        // BORROW BOOK COPY
+        mockMvc.perform(put("/api/books/{id}/copies/borrow", createdBookId))
+                .andExpect(status().isNoContent());
+
+        // VALIDATE BOOK COPY IF BORROWED
+        mockMvc.perform(get("/api/books/{id}/copies", createdBookId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].available").value(false));
+
+        // RETURN BOOK COPY
+        mockMvc.perform(put("/api/books/{id}/copies/return", createdBookId))
+                .andExpect(status().isNoContent());
+
+        // VALIDATE BOOK COPY IF RETURNED
+        mockMvc.perform(get("/api/books/{id}/copies", createdBookId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].available").value(true));
+    }
 }

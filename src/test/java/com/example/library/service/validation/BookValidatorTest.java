@@ -3,6 +3,7 @@ package com.example.library.service.validation;
 import com.example.library.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
+import static com.example.library.utility.BookConstants.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -10,19 +11,18 @@ public class BookValidatorTest {
 
     private final BookValidator validator = new BookValidator();
 
-
     @Test
     void GIVEN_null_isbn_WHEN_validateIsbn_THEN_throw_IllegalArgumentException() {
         assertThatThrownBy(() -> validator.validateIsbn(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("ISBN cannot be null");
+                .hasMessage(ISBN_CANNOT_BE_NULL);
     }
 
     @Test
     void GIVEN_invalid_isbn_WHEN_validateIsbn_THEN_throw_IllegalArgumentException() {
         assertThatThrownBy(() -> validator.validateIsbn("abc123"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid ISBN format");
+                .hasMessage(INVALID_ISBN_FORMAT);
     }
 
     @Test
@@ -39,15 +39,15 @@ public class BookValidatorTest {
 
         assertThatThrownBy(() -> validator.validatePublishedYear(tooEarly))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid published year");
+                .hasMessage(INVALID_PUBLISHED_YEAR);
 
         assertThatThrownBy(() -> validator.validatePublishedYear(futureYear))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid published year");
+                .hasMessage(INVALID_PUBLISHED_YEAR);
 
         assertThatThrownBy(() -> validator.validatePublishedYear(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid published year");
+                .hasMessage(INVALID_PUBLISHED_YEAR);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class BookValidatorTest {
     void GIVEN_mismatched_isbns_WHEN_validateIsbnConsistency_THEN_throw_ValidationException() {
         assertThatThrownBy(() -> validator.validateIsbnConsistency("1234", "5678"))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Book ISBN mismatch");
+                .hasMessageContaining(ISBN_MISMATCH_MATCH);
     }
 
     @Test

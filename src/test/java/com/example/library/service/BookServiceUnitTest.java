@@ -1,13 +1,20 @@
 package com.example.library.service;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
-import com.example.library.dto.bookdtos.*;
+import com.example.library.dto.bookdtos.BookDtoFull;
+import com.example.library.dto.bookdtos.BookDtoResponse;
+import com.example.library.dto.bookdtos.BookDtoSimple;
+import com.example.library.dto.bookdtos.BookDtoUpdate;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookRepository;
+import com.example.library.service.serviceimpl.BookCopyService;
 import com.example.library.service.serviceimpl.serviceimpl.BookServiceImpl;
+import com.example.library.service.validation.BookCopyFetcherValidator;
+import com.example.library.service.validation.BookCopyValidator;
 import com.example.library.service.validation.BookFetcherValidator;
 import com.example.library.service.validation.BookValidator;
+import com.example.library.utility.BookConstants;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +25,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.List;
 
+import static com.example.library.utility.BookConstants.BOOK_COPY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -33,7 +41,16 @@ public class BookServiceUnitTest {
     private BookValidator bookValidator;
 
     @Mock
+    private BookCopyValidator bookCopyValidator;
+
+    @Mock
     private BookFetcherValidator bookFetcherValidator;
+
+    @Mock
+    private BookCopyFetcherValidator bookCopyFetcherValidator;
+
+    @Mock
+    private BookCopyService bookCopyService;
 
     private BookServiceImpl bookService;
     private ModelMapper modelMapper;
@@ -42,7 +59,7 @@ public class BookServiceUnitTest {
     void setUp() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
-        bookService = new BookServiceImpl(bookRepository, modelMapper, bookValidator, bookFetcherValidator);
+        bookService = new BookServiceImpl(bookRepository, modelMapper, bookValidator, bookCopyValidator, bookFetcherValidator, bookCopyFetcherValidator, bookCopyService);
     }
 
     @Test
@@ -89,7 +106,7 @@ public class BookServiceUnitTest {
                 .title("Test Title")
                 .publishedYear(2024)
                 .build();
-
+        // When
         Book bookEntity = modelMapper.map(bookDto, Book.class);
         BookDtoResponse expectedDto = modelMapper.map(savedBook, BookDtoResponse.class);
 
@@ -117,11 +134,13 @@ public class BookServiceUnitTest {
 
     @Test
     void GIVEN_book_exists_WHEN_getBookById_THEN_return_BookDtoFull() {
+        // Given
         Long bookId = 1L;
         Book book = Book.builder()
                 .title("Book")
                 .build();
 
+        // When
         when(bookFetcherValidator.getBookIfExistInDB(bookId)).thenReturn(book);
 
         BookDtoFull expected = modelMapper.map(book, BookDtoFull.class);
@@ -179,12 +198,14 @@ public class BookServiceUnitTest {
 
     @Test
     void GIVEN_book_no_exist_WHEN_deleteBook_THEN_throwEntityNotFoundException() {
+        // Given
         Long nonExistId = 10L;
         when(bookRepository.existsById(nonExistId)).thenReturn(false);
 
+        // When  //Then
         assertThatThrownBy(() -> bookService.deleteBook(nonExistId))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("Book not found with id: " + nonExistId);
+                .hasMessageContaining(BOOK_COPY_NOT_FOUND + nonExistId);
 
         verify(bookRepository).existsById(nonExistId);
         verify(bookRepository, never()).deleteById(any());
@@ -192,25 +213,29 @@ public class BookServiceUnitTest {
 
     @Test
     void GIVEN_book_exists_WHEN_deleteBook_THEN_deleteById_called() {
+        // Given
         Long existId = 5L;
         when(bookRepository.existsById(existId)).thenReturn(true);
         doNothing().when(bookRepository).deleteById(existId);
 
+        // When
         bookService.deleteBook(existId);
 
+        // Then
         verify(bookRepository).existsById(existId);
         verify(bookRepository).deleteById(existId);
     }
 
     @Test
     void GIVEN_book_with_copies_WHEN_getCopiesByBookId_THEN_return_CopyDtos_list() {
+        // Given
         Long bookId = 1L;
         Book book = new Book();
 
         BookCopy copy1 = new BookCopy();
         BookCopy copy2 = new BookCopy();
         book.setCopies(List.of(copy1, copy2));
-
+        // When
         when(bookFetcherValidator.getBookIfExistInDB(bookId)).thenReturn(book);
 
         List<BookCopyDtoSimple> expectedList = book.getCopies().stream()
@@ -219,6 +244,7 @@ public class BookServiceUnitTest {
 
         List<BookCopyDtoSimple> result = bookService.getCopiesByBookId(bookId);
 
+        // Then
         assertThat(result)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedList);
@@ -290,6 +316,95 @@ public class BookServiceUnitTest {
 
         verify(bookRepository).existsByTitle(null);
         verify(bookRepository).existsByIsbn(null);
+    }
+
+    @Test
+    void GIVEN_available_false_AND_unavailable_copy_exists_WHEN_updateAvailability_THEN_update_called() {
+        // Given
+        Long bookId = 1L;
+        boolean available = false;
+
+        BookCopy unavailableCopy = new BookCopy();
+        unavailableCopy.setId(100L);
+        unavailableCopy.setAvailable(true);
+
+        Book book = new Book();
+        book.setCopies(List.of(unavailableCopy));
+
+        when(bookFetcherValidator.getBookIfExistInDB(bookId)).thenReturn(book);
+        doNothing().when(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        doNothing().when(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+        doNothing().when(bookCopyFetcherValidator).validateIfBookCopyIsAvailable(List.of(unavailableCopy));
+
+        // When
+        bookService.updateBookCopyAvailability(bookId, available);
+
+        // Then
+        verify(bookFetcherValidator).getBookIfExistInDB(bookId);
+        verify(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        verify(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+        verify(bookCopyFetcherValidator).validateIfBookCopyIsAvailable(List.of(unavailableCopy));
+        verify(bookCopyService).updateAvailability(bookId, unavailableCopy.getId(), BookConstants.UNAVAILABLE);
+    }
+
+    @Test
+    void GIVEN_available_true_AND_available_copy_exists_WHEN_updateAvailability_THEN_update_called() {
+        // Given
+        Long bookId = 2L;
+        boolean available = true;
+
+        BookCopy unavailableCopy = new BookCopy();
+        unavailableCopy.setId(200L);
+        unavailableCopy.setAvailable(false);
+
+        Book book = new Book();
+        book.setCopies(List.of(unavailableCopy));
+
+        when(bookFetcherValidator.getBookIfExistInDB(bookId)).thenReturn(book);
+        doNothing().when(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        doNothing().when(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+        doNothing().when(bookCopyFetcherValidator).validateIfBookCopyIsUnavailable(List.of(unavailableCopy));
+
+        // When
+        bookService.updateBookCopyAvailability(bookId, available);
+
+        // Then
+        verify(bookFetcherValidator).getBookIfExistInDB(bookId);
+        verify(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        verify(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+        verify(bookCopyFetcherValidator).validateIfBookCopyIsUnavailable(List.of(unavailableCopy));
+        verify(bookCopyService).updateAvailability(bookId, unavailableCopy.getId(), BookConstants.AVAILABLE);
+    }
+
+    @Test
+    void GIVEN_no_matching_copies_WHEN_updateAvailability_THEN_throw_exception() {
+        // Given
+        Long bookId = 3L;
+        boolean available = true;
+
+        BookCopy copy = new BookCopy();
+        copy.setId(300L);
+        copy.setAvailable(true);
+
+        Book book = new Book();
+        book.setCopies(List.of(copy));
+
+        when(bookFetcherValidator.getBookIfExistInDB(bookId)).thenReturn(book);
+        doNothing().when(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        doNothing().when(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+        doThrow(new IllegalArgumentException(BookConstants.NO_UNAVAILABLE_COPIES))
+                .when(bookCopyValidator).validateBookCopyAvailability(List.of());
+
+        // When / Then
+        assertThatThrownBy(() -> bookService.updateBookCopyAvailability(bookId, available))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(BookConstants.NO_UNAVAILABLE_COPIES);
+
+        verify(bookFetcherValidator).getBookIfExistInDB(bookId);
+        verify(bookCopyFetcherValidator).validateExistsBookCopyFromBook(book);
+        verify(bookCopyFetcherValidator).validateIfBookCopyListIsNotEmpty(book.getCopies());
+
+        verify(bookCopyValidator).validateBookCopyAvailability(List.of());
     }
 }
 

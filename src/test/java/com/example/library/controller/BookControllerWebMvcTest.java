@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.library.utility.BookConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -125,7 +126,7 @@ public class BookControllerWebMvcTest {
     }
 
     @Test
-    void GIVEN_updateBookDto_WHEN_updateBook_THEN_returnUpdatedBook() throws Exception {
+    void GIVEN_updateBookDto_WHEN_updateBook_THEN_return_updatedBook() throws Exception {
         //GIVEN
         Long bookId = 1L;
 
@@ -175,5 +176,51 @@ public class BookControllerWebMvcTest {
                 .andExpect(jsonPath("$[0].available").value(true))
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].available").value(false));
+    }
+
+    @Test
+    void GIVEN_validBookId_WHEN_borrowBookCopy_THEN_return_No_Content_Status() throws Exception {
+        // GIVEN
+        Long bookId = 1L;
+
+        // WHEN  // THEN
+        mockMvc.perform(put("/api/books/{id}/copies/borrow", bookId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void GIVEN_validBookId_WHEN_returnBookCopy_THEN_return_No_Content_Status() throws Exception {
+        // GIVEN
+        Long bookId = 1L;
+
+        // WHEN // THEN
+        mockMvc.perform(put("/api/books/{id}/copies/return", bookId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void GIVEN_no_exists_BookId_WHEN_borrowBookCopy_THEN_return_Not_Found_Status() throws Exception {
+        // GIVEN
+        Long bookId = 999L;
+
+        org.mockito.Mockito.doThrow(new com.example.library.exception.BookNotFoundException("Book not found"))
+                .when(bookService).updateBookCopyAvailability(eq(bookId), eq(BORROW_BOOK_COPY));
+
+        // WHEN // THEN
+        mockMvc.perform(put("/api/books/{id}/copies/borrow", bookId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void GIVEN_no_exists_BookId__WHEN_returnBookCopy_THEN_return_Not_Found_Status() throws Exception {
+        // GIVEN
+        Long bookId = 999L;
+
+        org.mockito.Mockito.doThrow(new com.example.library.exception.BookNotFoundException("Book not found"))
+                .when(bookService).updateBookCopyAvailability(eq(bookId), eq(RETURN_BOOK_COPY));
+
+        // WHEN // THEN
+        mockMvc.perform(put("/api/books/{id}/copies/return", bookId))
+                .andExpect(status().isNotFound());
     }
 }
