@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Books</title>
+    <link rel="stylesheet" href="/css/books_page.css">
+</head>
+<body>
+
+<h1>Welcome to the Library</h1>
+
+<p th:if="${name}" th:text="'Welcome, ' + ${name} + '! Here are your books:'">There are books:</p>
+
+<button class="btn btn-add" onclick="showAddBookForm()">➕ Add Book</button>
+
+<div th:replace="add_book_form :: addBookForm"></div>   <!--insert add_book_form.html here-->
+
+<div th:each="book : ${books}" class="book-card">
+    <h3 th:text="${book.title}">Book Title</h3>
+    <div class="copy-info" th:id="'copy-info-' + ${book.id}">Loading copies...</div>
+    <button class="btn btn-copy" th:attr="onclick='addCopy(' + ${book.id} + ')'">📚 Add Copy</button>
+    <button class="btn btn-delete" th:attr="onclick='deleteBook(' + ${book.id} + ')'">🗑 Delete</button>
+    <button class="btn btn-copy" th:attr="onclick='borrowCopy(' + ${book.id} + ')'">📖 Borrow Copy</button>
+    <button class="btn btn-copy" th:attr="onclick='returnCopy(' + ${book.id} + ')'">✅ Return Copy</button>
+</div>
+
+<a href="/">HomePage</a>
+
+<script src="/js/books_page.js"></script>
+</body>
+</html>

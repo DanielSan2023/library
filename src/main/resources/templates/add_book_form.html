@@ -1,0 +1,20 @@
+<div  th:fragment="addBookForm" id="addBookForm" style="display:none; margin-top:20px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); max-width:400px;">
+    <h3>Add New Book</h3>
+    <form id="bookForm" onsubmit="submitBookForm(event)">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="author">Author:</label><br>
+        <input type="text" id="author" name="author" required><br><br>
+
+        <label for="isbn">ISBN:</label><br>
+        <input type="text" id="isbn" name="isbn" required><br><br>
+
+        <label for="publishedYear">Published Year:</label><br>
+        <input type="number" id="publishedYear" name="publishedYear" required min="1000" max="9999"><br><br>
+
+        <button type="submit" class="btn btn-add">Add Book</button>
+        <button type="button" class="btn" onclick="hideAddBookForm()">Cancel</button>
+    </form>
+    <div id="formError" style="color:red; margin-top:10px;"></div>
+</div>
