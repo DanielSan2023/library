@@ -1,0 +1,425 @@
+openapi: 3.0.3
+info:
+  title: Library Management
+  description: |
+    This entry project is Library Management System using Spring Boot for `ALANATA`.
+
+  contact:
+    name: ATALANTA
+    url: https://www.alanata.sk/
+    email: info@alanata.sk
+  version: 2025v5
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /api/books/{id}:
+    get:
+      tags:
+        - book-controller
+      summary: Get a book by ID
+      description: Fetches detailed information about a specific book by its ID.
+      operationId: getBookById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookDtoFull'
+    put:
+      tags:
+        - book-controller
+      summary: Update a book
+      description: Updates an existing book by ID using the provided request body data.
+      operationId: updateBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookDtoUpdate'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookDtoFull'
+    delete:
+      tags:
+        - book-controller
+      summary: Delete a book and its copies
+      description: Deletes a book from the database by its ID.
+      operationId: deleteBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /api/books/{id}/copies/{copyId}:
+    put:
+      tags:
+        - book-copy-controller
+      summary: Update a book copy
+      description: Updates a specific copy of a book (e.g., condition or availability).
+      operationId: updateBookCopyAvailability
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: copyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCopyDtoUpdate'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookCopyDtoFull'
+  /api/books/{id}/copies/return:
+    put:
+      tags:
+        - book-controller
+      summary: Return a book copy
+      description: Allows a user to return a borrowed copy of a book.
+      operationId: returnBookCopy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /api/books/{id}/copies/borrow:
+    put:
+      tags:
+        - book-controller
+      summary: Borrow a book copy
+      description: Allows a user to borrow a specific copy of a book.
+      operationId: borrowBookCopy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /api/books:
+    get:
+      tags:
+        - book-controller
+      summary: Get all books
+      description: Returns a list of all available books in the system.
+      operationId: getAllBooks
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookDtoSimple'
+    post:
+      tags:
+        - book-controller
+      summary: Create a new book
+      description: Creates a new book based on request body.
+      operationId: createBook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookDtoResponse'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookDtoSimple'
+  /api/books/{id}/copies:
+    get:
+      tags:
+        - book-controller
+      summary: Get all copies of a book
+      description: Returns a list of all physical copies of a specific book.
+      operationId: getAllBookCopies
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookCopyDtoSimple'
+    post:
+      tags:
+        - book-copy-controller
+      summary: Add a new book copy
+      description: Creates a new physical copy for the specified book.
+      operationId: addCopyToBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookCopyDtoSimple'
+  /api/books/pageable:
+    get:
+      tags:
+        - book-controller
+      summary: Get books with pagination
+      description: >-
+        Returns a paginated list of books based on page, size, and sort
+        parameters.
+      operationId: getBooksPageable
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 3
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageBookDtoSimple'
+components:
+  schemas:
+    BookDtoUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        isbn:
+          type: string
+        publishedYear:
+          type: integer
+          format: int32
+      required:
+        - isbn
+        - publishedYear
+        - title
+    BookCopyDtoSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        available:
+          type: boolean
+      required:
+        - available
+        - id
+    BookDtoFull:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        publishedYear:
+          type: integer
+          format: int32
+        copies:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookCopyDtoSimple'
+      required:
+        - author
+        - isbn
+        - publishedYear
+        - title
+    BookCopyDtoUpdate:
+      type: object
+      properties:
+        available:
+          type: boolean
+      required:
+        - available
+    BookCopyDtoFull:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        book:
+          $ref: '#/components/schemas/BookDtoSimple'
+        available:
+          type: boolean
+      required:
+        - available
+        - book
+    BookDtoSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        publishedYear:
+          type: integer
+          format: int32
+      required:
+        - author
+        - isbn
+        - publishedYear
+        - title
+    BookDtoResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        publishedYear:
+          type: integer
+          format: int32
+      required:
+        - author
+        - isbn
+        - publishedYear
+        - title
+    PageBookDtoSimple:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookDtoSimple'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
