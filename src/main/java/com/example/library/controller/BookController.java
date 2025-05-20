@@ -7,6 +7,7 @@ import com.example.library.dto.bookdtos.BookDtoResponse;
 import com.example.library.dto.bookdtos.BookDtoSimple;
 import com.example.library.dto.bookdtos.BookDtoUpdate;
 import com.example.library.service.serviceimpl.BookService;
+import com.example.library.utility.BookConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.Utilities;
 import java.util.List;
 
 @RestController
@@ -99,5 +101,23 @@ public class BookController {
         Pageable pageable = PageRequest.of(page, size, sorting);
         Page<BookDtoSimple> books = bookService.getPageBooks(pageable);
         return ResponseEntity.ok(books);
+    }
+
+    @Operation(
+            summary = "Borrow a book copy",
+            description = "Allows a user to borrow a specific copy of a book.")
+    @PutMapping("/{id}/copies/borrow")
+    public ResponseEntity<Void> borrowBookCopy(@PathVariable Long id) {
+        bookService.updateBookCopyAvailability(id, BookConstants.BORROW_BOOK_COPY);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(
+            summary = "Return a book copy",
+            description = "Allows a user to return a borrowed copy of a book.")
+    @PutMapping("/{id}/copies/return")
+    public ResponseEntity<Void> returnBookCopy(@PathVariable Long id) {
+        bookService.updateBookCopyAvailability(id, BookConstants.RETURN_BOOK_COPY);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

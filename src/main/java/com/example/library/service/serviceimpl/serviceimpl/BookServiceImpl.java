@@ -3,10 +3,14 @@ package com.example.library.service.serviceimpl.serviceimpl;
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
 import com.example.library.entity.Book;
+import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookRepository;
+import com.example.library.service.serviceimpl.BookCopyService;
 import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.validation.BookCopyFetcherValidator;
 import com.example.library.service.validation.BookFetcherValidator;
 import com.example.library.service.validation.BookValidator;
+import com.example.library.utility.BookConstants;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +30,8 @@ public class BookServiceImpl implements BookService {
     private final ModelMapper modelMapper;
     private final BookValidator bookValidator;
     private final BookFetcherValidator bookFetcherValidator;
+    private final BookCopyFetcherValidator bookCopyFetcherValidator;
+    private final BookCopyService bookCopyService;
 
     @Override
     public List<BookDtoSimple> getAllBooks() {
@@ -81,7 +87,6 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<BookCopyDtoSimple> getCopiesByBookId(Long id) {
         Book book = bookFetcherValidator.getBookIfExistInDB(id);
 
@@ -103,5 +108,28 @@ public class BookServiceImpl implements BookService {
         if (bookRepository.existsByIsbn(bookDto.getIsbn())) {
             throw new IllegalArgumentException("Book with ISBN is already exist in DB!");
         }
+    }
+
+    @Override
+    public void updateBookCopyAvailability(Long bookId, Boolean available) {
+        Book book = bookFetcherValidator.getBookIfExistInDB(bookId);
+        bookCopyFetcherValidator.validateExistsBookCopyFromBook(book);
+
+        List<BookCopy> allBookCopies = book.getCopies();
+        bookCopyFetcherValidator.validateIfBookCopyListIsNotEmpty(allBookCopies);
+
+        List<BookCopy> filteredCopies = allBookCopies.stream()
+                .filter(copy -> Boolean.valueOf(!available).equals(copy.getAvailable()))
+                .toList();
+
+        if (available) {
+            bookCopyFetcherValidator.validateIfBookCopyIsUnavailable(filteredCopies);
+        } else {
+            bookCopyFetcherValidator.validateIfBookCopyIsAvailable(filteredCopies);
+        }
+
+        BookCopy targetBookCopy = filteredCopies.get(0);
+
+        bookCopyService.updateAvailability(bookId, targetBookCopy.getId(), available ? BookConstants.AVAILABLE : BookConstants.UNAVAILABLE);
     }
 }

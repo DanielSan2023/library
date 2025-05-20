@@ -22,4 +22,6 @@ public interface BookService {
     List<BookCopyDtoSimple> getCopiesByBookId(Long id);
 
     Page<BookDtoSimple> getPageBooks(Pageable pageable);
+
+     void updateBookCopyAvailability(Long bookId, Boolean available);
 }
