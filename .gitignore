@@ -6,3 +6,5 @@ target
 
 /logs/library-prod.log
 /resources/logs/library-prod.log
+/logs/library-error.log
+/logs/library-warn.log
