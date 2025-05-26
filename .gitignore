@@ -8,8 +8,4 @@ target
 /resources/logs/library-prod.log
 /logs/library-error.log
 /logs/library-warn.log
-/logs/library-prod.log
-/resources/logs/library-prod.log
-/logs/library-error.log
-/logs/library-warn.log
 /src/main/resources/keystore.p12
