@@ -4,3 +4,5 @@
 *.ipr
 target
 
+/logs/library-prod.log
+/resources/logs/library-prod.log

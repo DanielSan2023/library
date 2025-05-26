@@ -1,6 +1,7 @@
 package com.example.library.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,25 +11,26 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
-import static com.example.library.utility.ErrorMessages.*;
-
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BookNotFoundException.class)
     public ResponseEntity<ApiError> handleProductNotFound(BookNotFoundException e) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, BOOK_NOT_FOUND, e.getMessage(), null);
+        log.error("📕 Book not found exception: {}", e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Book not Found", e.getMessage(), null);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiError> handleEntityNotFound(EntityNotFoundException e) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ENTITY_NOT_FOUND, e.getMessage(), null);
+        log.error("❌ Entity not found: {}", e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Entity not found", e.getMessage(), null);
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiError> handleValidationException(ValidationException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, VALIDATION_FAILED, e.getMessage(), null);
+        log.error("❌ Validation error: {}", e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", e.getMessage(), null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,22 +39,26 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> String.format("[%s] %s", fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
 
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, INVALID_REQUEST_BODY, message, null);
+        log.error("❌ Method argument not valid: {}", message, e);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid request body", message, null);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, BAD_REQUEST, e.getMessage(), null);
+        log.error("❌ Illegal argument: {}", e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad request", e.getMessage(), null);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntimeException(RuntimeException e) {
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED_ERROR, e.getMessage(), null);
+        log.error("❌ Unexpected runtime exception", e);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e.getMessage(), null);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(Exception e) {
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED_ERROR, GENERIC_UNEXPECTED_ERROR, e.getMessage());
+        log.error("❌ Unhandled exception", e);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", "An unexpected error occurred.", e.getMessage());
     }
 
     private ResponseEntity<ApiError> buildErrorResponse(HttpStatus status, String error, String message, String details) {
