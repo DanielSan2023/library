@@ -3,7 +3,7 @@ package com.example.library.controller;
 import com.example.library.dto.bookcopydtos.BookCopyDtoFull;
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookcopydtos.BookCopyDtoUpdate;
-import com.example.library.service.serviceimpl.BookCopyService;
+import com.example.library.service.service.BookCopyService;
 import com.example.library.exception.BookNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
