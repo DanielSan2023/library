@@ -6,7 +6,7 @@ import com.example.library.dto.bookdtos.BookDtoFull;
 import com.example.library.dto.bookdtos.BookDtoResponse;
 import com.example.library.dto.bookdtos.BookDtoSimple;
 import com.example.library.dto.bookdtos.BookDtoUpdate;
-import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.service.BookService;
 import com.example.library.utility.BookConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

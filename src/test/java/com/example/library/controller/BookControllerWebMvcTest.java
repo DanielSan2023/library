@@ -2,7 +2,7 @@ package com.example.library.controller;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
-import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

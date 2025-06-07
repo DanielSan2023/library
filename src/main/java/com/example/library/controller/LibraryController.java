@@ -1,7 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.bookdtos.BookDtoSimple;
-import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

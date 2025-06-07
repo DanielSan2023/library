@@ -18,6 +18,7 @@ public class BookConstants {
     public static final String ISBN_MISMATCH_MATCH = "Book ISBN mismatch";
     public static final String INVALID_ISBN_FORMAT = "Invalid ISBN format.";
     public static final String INVALID_PUBLISHED_YEAR = "Invalid published year.";
+    public static final String DEFAULT_CUSTOMER_ROLE = "USER";
 
     public static final boolean UNAVAILABLE = false;
     public static final boolean AVAILABLE = true;
