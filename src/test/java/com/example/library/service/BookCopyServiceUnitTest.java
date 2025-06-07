@@ -5,7 +5,7 @@ import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookCopyRepository;
-import com.example.library.service.serviceimpl.serviceimpl.BookCopyServiceImpl;
+import com.example.library.service.service.serviceimpl.BookCopyServiceImpl;
 import com.example.library.service.validation.BookCopyFetcherValidator;
 import com.example.library.service.validation.BookFetcherValidator;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

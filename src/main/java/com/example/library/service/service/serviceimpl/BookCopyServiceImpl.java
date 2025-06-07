@@ -1,21 +1,17 @@
-package com.example.library.service.serviceimpl.serviceimpl;
+package com.example.library.service.service.serviceimpl;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookcopydtos.BookCopyDtoFull;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookCopyRepository;
-import com.example.library.service.serviceimpl.BookCopyService;
+import com.example.library.service.service.BookCopyService;
 import com.example.library.service.validation.BookCopyFetcherValidator;
 import com.example.library.service.validation.BookFetcherValidator;
-import com.example.library.utility.BookConstants;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor

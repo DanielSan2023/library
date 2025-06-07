@@ -1,12 +1,12 @@
-package com.example.library.service.serviceimpl.serviceimpl;
+package com.example.library.service.service.serviceimpl;
 
 import com.example.library.dto.bookcopydtos.BookCopyDtoSimple;
 import com.example.library.dto.bookdtos.*;
 import com.example.library.entity.Book;
 import com.example.library.entity.BookCopy;
 import com.example.library.repository.BookRepository;
-import com.example.library.service.serviceimpl.BookCopyService;
-import com.example.library.service.serviceimpl.BookService;
+import com.example.library.service.service.BookCopyService;
+import com.example.library.service.service.BookService;
 import com.example.library.service.validation.BookCopyFetcherValidator;
 import com.example.library.service.validation.BookCopyValidator;
 import com.example.library.service.validation.BookFetcherValidator;
